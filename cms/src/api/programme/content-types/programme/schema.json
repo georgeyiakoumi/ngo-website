@@ -1,0 +1,53 @@
+{
+  "kind": "collectionType",
+  "collectionName": "programmes",
+  "info": {
+    "singularName": "programme",
+    "pluralName": "programmes",
+    "displayName": "Programme",
+    "description": "NGO programmes — may be gated by region and/or age"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "slug": {
+      "type": "uid",
+      "targetField": "title",
+      "required": true
+    },
+    "description": {
+      "type": "text"
+    },
+    "content": {
+      "type": "blocks"
+    },
+    "featuredImage": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": ["images"]
+    },
+    "visibility": {
+      "type": "enumeration",
+      "enum": ["public", "member"],
+      "default": "public",
+      "required": true
+    },
+    "regions": {
+      "type": "json",
+      "required": false
+    },
+    "minAge": {
+      "type": "integer",
+      "required": false
+    },
+    "maxAge": {
+      "type": "integer",
+      "required": false
+    }
+  }
+}

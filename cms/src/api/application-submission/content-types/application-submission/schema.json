@@ -1,0 +1,64 @@
+{
+  "kind": "collectionType",
+  "collectionName": "application_submissions",
+  "info": {
+    "singularName": "application-submission",
+    "pluralName": "application-submissions",
+    "displayName": "Application Submission",
+    "description": "Member application form submissions — gated by region and age"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "attributes": {
+    "formTitle": {
+      "type": "string",
+      "required": true
+    },
+    "submittedBy": {
+      "type": "string",
+      "required": true
+    },
+    "submittedEmail": {
+      "type": "email",
+      "required": true
+    },
+    "submittedRegion": {
+      "type": "enumeration",
+      "enum": ["uk", "usa", "greece", "new-zealand", "south-africa", "canada", "rest-of-europe", "rest-of-africa"],
+      "required": true
+    },
+    "submittedAge": {
+      "type": "integer",
+      "required": true
+    },
+    "responses": {
+      "type": "json",
+      "required": true
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": ["pending", "reviewed", "approved", "rejected"],
+      "default": "pending",
+      "required": true
+    },
+    "visibility": {
+      "type": "enumeration",
+      "enum": ["public", "member"],
+      "default": "member",
+      "required": true
+    },
+    "regions": {
+      "type": "json",
+      "required": false
+    },
+    "minAge": {
+      "type": "integer",
+      "required": false
+    },
+    "maxAge": {
+      "type": "integer",
+      "required": false
+    }
+  }
+}
