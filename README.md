@@ -45,7 +45,7 @@ See `.env.example` for the full list. Key values:
 
 ### Strapi CMS (Render)
 
-See [`strapi/README.md`](strapi/README.md) for full setup instructions.
+See [`cms/README.md`](cms/README.md) for full setup instructions.
 
 ## Repo structure
 
@@ -53,7 +53,7 @@ See [`strapi/README.md`](strapi/README.md) for full setup instructions.
 app/              Next.js App Router pages and layouts
 components/ui/    shadcn/ui components
 lib/              Utilities (cn helper, future Supabase clients)
-strapi/           Strapi CMS subfolder (deployed separately to Render)
+cms/              Strapi CMS (deployed separately to Render)
 e2e/              Playwright end-to-end tests
 scripts/          Build and setup scripts
 public/           Static assets
