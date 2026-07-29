@@ -1,7 +1,7 @@
 'use client'
 
 import { useActionState } from 'react'
-import { login } from './actions'
+import { forgotPassword } from './actions'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -14,10 +14,13 @@ import {
 } from '@/components/ui/card'
 import Link from 'next/link'
 
-function LoginForm() {
+function ForgotPasswordForm() {
   const [state, formAction, pending] = useActionState(
-    async (_prev: { error: string } | null, formData: FormData) => {
-      return await login(formData)
+    async (
+      _prev: { error?: string; success?: string } | null,
+      formData: FormData
+    ) => {
+      return await forgotPassword(formData)
     },
     null
   )
@@ -27,10 +30,10 @@ function LoginForm() {
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle className="text-2xl font-semibold tracking-tight">
-            Log in
+            Reset your password
           </CardTitle>
           <CardDescription>
-            Enter your email and password to access your account.
+            Enter your email and we&apos;ll send you a reset link.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -40,43 +43,30 @@ function LoginForm() {
               <Input id="email" name="email" type="email" required />
             </div>
 
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                name="password"
-                type="password"
-                required
-              />
-            </div>
-
             {state?.error && (
               <p className="text-sm text-destructive" role="alert">
                 {state.error}
               </p>
             )}
 
+            {state?.success && (
+              <p className="text-sm text-muted-foreground" role="status">
+                {state.success}
+              </p>
+            )}
+
             <Button type="submit" disabled={pending} className="w-full">
-              {pending ? 'Logging in...' : 'Log in'}
+              {pending ? 'Sending...' : 'Send reset link'}
             </Button>
 
-            <div className="flex flex-col gap-2 text-center text-sm text-muted-foreground">
+            <p className="text-center text-sm text-muted-foreground">
               <Link
-                href="/forgot-password"
+                href="/login"
                 className="text-primary underline-offset-4 hover:underline"
               >
-                Forgot your password?
+                Back to login
               </Link>
-              <p>
-                Don&apos;t have an account?{' '}
-                <Link
-                  href="/signup"
-                  className="text-primary underline-offset-4 hover:underline"
-                >
-                  Sign up
-                </Link>
-              </p>
-            </div>
+            </p>
           </form>
         </CardContent>
       </Card>
@@ -84,6 +74,6 @@ function LoginForm() {
   )
 }
 
-export default function LoginPage() {
-  return <LoginForm />
+export default function ForgotPasswordPage() {
+  return <ForgotPasswordForm />
 }

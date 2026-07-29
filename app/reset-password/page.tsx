@@ -1,7 +1,7 @@
 'use client'
 
 import { useActionState } from 'react'
-import { login } from './actions'
+import { resetPassword } from './actions'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -12,12 +12,11 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import Link from 'next/link'
 
-function LoginForm() {
+function ResetPasswordForm() {
   const [state, formAction, pending] = useActionState(
     async (_prev: { error: string } | null, formData: FormData) => {
-      return await login(formData)
+      return await resetPassword(formData)
     },
     null
   )
@@ -27,25 +26,32 @@ function LoginForm() {
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle className="text-2xl font-semibold tracking-tight">
-            Log in
+            Set new password
           </CardTitle>
           <CardDescription>
-            Enter your email and password to access your account.
+            Enter your new password below.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form action={formAction} className="flex flex-col gap-4">
             <div className="flex flex-col gap-2">
-              <Label htmlFor="email">Email</Label>
-              <Input id="email" name="email" type="email" required />
-            </div>
-
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">New password</Label>
               <Input
                 id="password"
                 name="password"
                 type="password"
+                minLength={8}
+                required
+              />
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="confirmPassword">Confirm password</Label>
+              <Input
+                id="confirmPassword"
+                name="confirmPassword"
+                type="password"
+                minLength={8}
                 required
               />
             </div>
@@ -57,26 +63,8 @@ function LoginForm() {
             )}
 
             <Button type="submit" disabled={pending} className="w-full">
-              {pending ? 'Logging in...' : 'Log in'}
+              {pending ? 'Updating...' : 'Update password'}
             </Button>
-
-            <div className="flex flex-col gap-2 text-center text-sm text-muted-foreground">
-              <Link
-                href="/forgot-password"
-                className="text-primary underline-offset-4 hover:underline"
-              >
-                Forgot your password?
-              </Link>
-              <p>
-                Don&apos;t have an account?{' '}
-                <Link
-                  href="/signup"
-                  className="text-primary underline-offset-4 hover:underline"
-                >
-                  Sign up
-                </Link>
-              </p>
-            </div>
           </form>
         </CardContent>
       </Card>
@@ -84,6 +72,6 @@ function LoginForm() {
   )
 }
 
-export default function LoginPage() {
-  return <LoginForm />
+export default function ResetPasswordPage() {
+  return <ResetPasswordForm />
 }
