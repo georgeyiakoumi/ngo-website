@@ -11,4 +11,4 @@ When a new lesson is written to Notion, add a summary line here immediately.
 
 ## Lessons
 
-_(No lessons recorded yet. Add the first entry when the first lesson is written to Notion.)_
+- 1. 29/07/2026 — MCP setup in Claude Code VS Code extension → Use `Cmd+Shift+P → MCP: Browse MCP Servers` to add MCPs; don't use the terminal CLI (doesn't exist) or `.vscode/mcp.json` (that's for Copilot, not Claude Code). All Claude Code MCPs are cloud-hosted and prefixed `mcp__claude_ai_*`.
