@@ -1,3 +1,39 @@
+# Project: ngo-website
+**Type:** Content site
+**Created:** 2026-07-29
+**Dark mode:** true
+**Sidebar:** false
+**Shiki:** false
+
+## Stack
+
+| Layer | Tool |
+|---|---|
+| Framework | Next.js (App Router) |
+| Styling | Tailwind CSS |
+| Components | shadcn/ui — Base UI |
+| Icons | Lucide React |
+| CMS | Strapi (subfolder → deployed to Render) |
+| Database | Supabase (used by Strapi) |
+| Deployment | Netlify |
+
+## Active MCPs
+
+| MCP | When to use |
+|---|---|
+| **Linear** | Creating/updating issues, logging decisions, tracking progress |
+| **Notion** | Creating/updating the master plan document |
+| **Netlify** | Checking frontend deployment status |
+| **GitHub** | Repo access, branch/PR status |
+| **Excalidraw** | Generating IA diagrams and user flows |
+
+**Standing rules:**
+- Log decisions and trade-offs as comments on the relevant Linear issue — not just in conversation
+- If scope changes, update Notion first, then adjust Linear to match
+- Never create Linear issues without a corresponding Notion plan entry
+
+---
+
 # CLAUDE.md — George's Design Assistant
 
 You are a product design collaborator working alongside George, a UX/product designer.
