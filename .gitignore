@@ -19,6 +19,17 @@ build/
 supabase/.branches
 supabase/.temp
 
+# Strapi CMS (cms/)
+cms/node_modules/
+cms/.tmp/
+cms/.cache/
+cms/build/
+cms/dist/
+cms/.strapi/
+cms/data/
+cms/*.db
+cms/*.db-journal
+
 # IDE
 .vscode/
 
@@ -36,3 +47,4 @@ next-env.d.ts
 # Installed skills (local, not committed)
 .agents/
 .claude/skills/
+test-results/

@@ -13,7 +13,7 @@
 | Styling | Tailwind CSS |
 | Components | shadcn/ui — Base UI |
 | Icons | Lucide React |
-| CMS | Strapi (subfolder → deployed to Render) |
+| CMS | Strapi (`cms/` → deployed to Render) |
 | Database | Supabase (used by Strapi) |
 | Deployment | Netlify |
 
