@@ -1,9 +1,13 @@
 'use client'
 
+import * as React from 'react'
 import { useActionState } from 'react'
+import Form from 'next/form'
+import { toast } from 'sonner'
 import { submitApplication } from './actions'
 import { Button } from '@/components/ui/button'
-import { Label } from '@/components/ui/label'
+import { Spinner } from '@/components/ui/spinner'
+import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { Textarea } from '@/components/ui/textarea'
 
 interface ApplicationFormProps {
@@ -14,6 +18,13 @@ interface ApplicationFormProps {
   maxAge: number | null
 }
 
+type ApplicationFormState = {
+  error?: string
+  success: boolean
+}
+
+const initialState: ApplicationFormState = { success: false }
+
 export function ApplicationForm({
   formTitle,
   visibility,
@@ -23,16 +34,24 @@ export function ApplicationForm({
 }: ApplicationFormProps) {
   const [state, formAction, pending] = useActionState(
     async (
-      _prev: { error?: string; success?: string } | null,
+      _prev: ApplicationFormState,
       formData: FormData
-    ) => {
-      return await submitApplication(formData)
+    ): Promise<ApplicationFormState> => {
+      const result = await submitApplication(formData)
+      if (result.error) return { error: result.error, success: false }
+      return { success: true }
     },
-    null
+    initialState
   )
 
+  React.useEffect(() => {
+    if (state.success) {
+      toast('Application submitted successfully.')
+    }
+  }, [state.success])
+
   return (
-    <form action={formAction} className="flex flex-col gap-4">
+    <Form action={formAction}>
       {/* Hidden gating metadata for server-side re-validation */}
       <input type="hidden" name="formTitle" value={formTitle} />
       <input type="hidden" name="visibility" value={visibility} />
@@ -52,34 +71,32 @@ export function ApplicationForm({
         value={maxAge != null ? String(maxAge) : ''}
       />
 
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="motivation">
-          Why are you interested in this programme?
-        </Label>
-        <Textarea
-          id="motivation"
-          name="motivation"
-          rows={5}
-          required
-          placeholder="Tell us about your interest and what you hope to gain..."
-        />
-      </div>
+      <FieldGroup>
+        <Field data-disabled={pending}>
+          <FieldLabel htmlFor="motivation">
+            Why are you interested in this programme?
+          </FieldLabel>
+          <Textarea
+            id="motivation"
+            name="motivation"
+            rows={5}
+            disabled={pending}
+            required
+            placeholder="Tell us about your interest and what you hope to gain..."
+          />
+        </Field>
 
-      {state?.error && (
-        <p className="text-sm text-destructive" role="alert">
-          {state.error}
-        </p>
-      )}
+        {state.error && (
+          <p className="text-sm text-destructive" role="alert">
+            {state.error}
+          </p>
+        )}
 
-      {state?.success && (
-        <p className="text-sm text-muted-foreground" role="status">
-          {state.success}
-        </p>
-      )}
-
-      <Button type="submit" disabled={pending || !!state?.success}>
-        {pending ? 'Submitting...' : 'Submit application'}
-      </Button>
-    </form>
+        <Button type="submit" disabled={pending || state.success}>
+          {pending && <Spinner />}
+          Submit application
+        </Button>
+      </FieldGroup>
+    </Form>
   )
 }

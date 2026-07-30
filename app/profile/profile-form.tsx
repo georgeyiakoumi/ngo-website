@@ -1,10 +1,20 @@
 'use client'
 
+import * as React from 'react'
 import { useActionState } from 'react'
+import Form from 'next/form'
+import { toast } from 'sonner'
 import { updateProfile } from './actions'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+import { Spinner } from '@/components/ui/spinner'
+import {
+  Field,
+  FieldGroup,
+  FieldLabel,
+  FieldSet,
+  FieldLegend,
+} from '@/components/ui/field'
 import { REGIONS } from '@/lib/regions'
 
 interface ProfileFormProps {
@@ -13,6 +23,13 @@ interface ProfileFormProps {
   dateOfBirth: string
   email: string
 }
+
+type ProfileFormState = {
+  error?: string
+  success: boolean
+}
+
+const initialState: ProfileFormState = { success: false }
 
 export function ProfileForm({
   displayName,
@@ -25,69 +42,73 @@ export function ProfileForm({
 
   const [state, formAction, pending] = useActionState(
     async (
-      _prev: { error?: string; success?: string } | null,
+      _prev: ProfileFormState,
       formData: FormData
-    ) => {
-      return await updateProfile(formData)
+    ): Promise<ProfileFormState> => {
+      const result = await updateProfile(formData)
+      if (result.error) return { error: result.error, success: false }
+      return { success: true }
     },
-    null
+    initialState
   )
 
+  React.useEffect(() => {
+    if (state.success) {
+      toast('Profile updated.')
+    }
+  }, [state.success])
+
   return (
-    <form action={formAction} className="flex flex-col gap-6">
-      <div className="flex flex-col gap-4">
-        <h3 className="text-sm font-medium text-muted-foreground">
-          Editable
-        </h3>
+    <Form action={formAction}>
+      <FieldGroup>
+        <FieldSet>
+          <FieldLegend variant="label">Editable</FieldLegend>
+          <FieldGroup>
+            <Field data-disabled={pending}>
+              <FieldLabel htmlFor="displayName">Display name</FieldLabel>
+              <Input
+                id="displayName"
+                name="displayName"
+                type="text"
+                defaultValue={displayName}
+                disabled={pending}
+                required
+              />
+            </Field>
+          </FieldGroup>
+        </FieldSet>
 
-        <div className="flex flex-col gap-2">
-          <Label htmlFor="displayName">Display name</Label>
-          <Input
-            id="displayName"
-            name="displayName"
-            type="text"
-            defaultValue={displayName}
-            required
-          />
-        </div>
-      </div>
+        <FieldSet>
+          <FieldLegend variant="label">Read-only</FieldLegend>
+          <FieldGroup>
+            <Field data-disabled>
+              <FieldLabel>Email</FieldLabel>
+              <Input value={email} disabled />
+            </Field>
 
-      <div className="flex flex-col gap-4">
-        <h3 className="text-sm font-medium text-muted-foreground">
-          Read-only
-        </h3>
+            <Field data-disabled>
+              <FieldLabel>Region</FieldLabel>
+              <Input value={regionLabel} disabled />
+            </Field>
 
-        <div className="flex flex-col gap-2">
-          <Label>Email</Label>
-          <Input value={email} disabled />
-        </div>
+            <Field data-disabled>
+              <FieldLabel>Date of birth</FieldLabel>
+              <Input value={dateOfBirth} disabled />
+            </Field>
+          </FieldGroup>
+        </FieldSet>
 
-        <div className="flex flex-col gap-2">
-          <Label>Region</Label>
-          <Input value={regionLabel} disabled />
-        </div>
+        {state.error && (
+          <p className="text-sm text-destructive" role="alert">
+            {state.error}
+          </p>
+        )}
 
-        <div className="flex flex-col gap-2">
-          <Label>Date of birth</Label>
-          <Input value={dateOfBirth} disabled />
-        </div>
-      </div>
-
-      {state?.error && (
-        <p className="text-sm text-destructive" role="alert">
-          {state.error}
-        </p>
-      )}
-
-      {state?.success && (
-        <p className="text-sm text-muted-foreground" role="status">
-          {state.success}
-        </p>
-      )}
-
-      <Button type="submit" disabled={pending} className="w-full">
-        {pending ? 'Saving...' : 'Save changes'}
-      </Button>
-    </form>
+        <Button type="submit" disabled={pending} className="w-full">
+          {pending && <Spinner />}
+          Save changes
+        </Button>
+      </FieldGroup>
+    </Form>
   )
 }
