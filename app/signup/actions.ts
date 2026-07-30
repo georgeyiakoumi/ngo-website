@@ -2,7 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { REGIONS, type RegionSlug } from '@/lib/regions'
+import { signupSchema, type SignupFormState } from './schema'
 
 function isAtLeast18(dateOfBirth: string): boolean {
   const dob = new Date(dateOfBirth)
@@ -15,46 +15,57 @@ function isAtLeast18(dateOfBirth: string): boolean {
   return age >= 18
 }
 
-function isValidRegion(region: string): region is RegionSlug {
-  return REGIONS.some((r) => r.slug === region)
-}
-
-export async function signup(formData: FormData) {
-  const email = formData.get('email') as string
-  const password = formData.get('password') as string
-  const displayName = formData.get('displayName') as string
-  const dateOfBirth = formData.get('dateOfBirth') as string
-  const region = formData.get('region') as string
-
-  // Server-side validation
-  if (!email || !password || !displayName || !dateOfBirth || !region) {
-    return { error: 'All fields are required.' }
+export async function signup(
+  _prev: SignupFormState,
+  formData: FormData
+): Promise<SignupFormState> {
+  const values = {
+    displayName: formData.get('displayName') as string,
+    email: formData.get('email') as string,
+    password: formData.get('password') as string,
+    dateOfBirth: formData.get('dateOfBirth') as string,
+    region: formData.get('region') as string,
   }
 
-  if (!isValidRegion(region)) {
-    return { error: 'Invalid region selected.' }
+  const result = signupSchema.safeParse(values)
+
+  if (!result.success) {
+    return {
+      values,
+      errors: result.error.flatten().fieldErrors,
+      success: false,
+    }
   }
 
-  if (!isAtLeast18(dateOfBirth)) {
-    return { error: 'You must be at least 18 years old to sign up.' }
+  if (!isAtLeast18(result.data.dateOfBirth)) {
+    return {
+      values,
+      errors: { dateOfBirth: ['You must be at least 18 years old to sign up.'] },
+      success: false,
+    }
   }
 
   const supabase = await createClient()
 
   const { error } = await supabase.auth.signUp({
-    email,
-    password,
+    email: result.data.email,
+    password: result.data.password,
     options: {
       data: {
-        display_name: displayName,
-        region,
-        date_of_birth: dateOfBirth,
+        display_name: result.data.displayName,
+        region: result.data.region,
+        date_of_birth: result.data.dateOfBirth,
       },
     },
   })
 
   if (error) {
-    return { error: error.message }
+    return {
+      values,
+      errors: null,
+      message: error.message,
+      success: false,
+    }
   }
 
   redirect('/')

@@ -2,29 +2,40 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
+import { resetPasswordSchema, type ResetPasswordFormState } from './schema'
 
-export async function resetPassword(formData: FormData) {
-  const password = formData.get('password') as string
-  const confirmPassword = formData.get('confirmPassword') as string
-
-  if (!password || !confirmPassword) {
-    return { error: 'Both fields are required.' }
+export async function resetPassword(
+  _prev: ResetPasswordFormState,
+  formData: FormData
+): Promise<ResetPasswordFormState> {
+  const values = {
+    password: formData.get('password') as string,
+    confirmPassword: formData.get('confirmPassword') as string,
   }
 
-  if (password !== confirmPassword) {
-    return { error: 'Passwords do not match.' }
-  }
+  const result = resetPasswordSchema.safeParse(values)
 
-  if (password.length < 8) {
-    return { error: 'Password must be at least 8 characters.' }
+  if (!result.success) {
+    return {
+      values,
+      errors: result.error.flatten().fieldErrors,
+      success: false,
+    }
   }
 
   const supabase = await createClient()
 
-  const { error } = await supabase.auth.updateUser({ password })
+  const { error } = await supabase.auth.updateUser({
+    password: result.data.password,
+  })
 
   if (error) {
-    return { error: error.message }
+    return {
+      values,
+      errors: null,
+      message: error.message,
+      success: false,
+    }
   }
 
   redirect('/')

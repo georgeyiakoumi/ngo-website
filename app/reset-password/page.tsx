@@ -1,10 +1,13 @@
 'use client'
 
 import { useActionState } from 'react'
+import Form from 'next/form'
 import { resetPassword } from './actions'
+import { type ResetPasswordFormState } from './schema'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+import { Spinner } from '@/components/ui/spinner'
+import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field'
 import {
   Card,
   CardContent,
@@ -13,16 +16,20 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 
+const initialState: ResetPasswordFormState = {
+  values: { password: '', confirmPassword: '' },
+  errors: null,
+  success: false,
+}
+
 function ResetPasswordForm() {
   const [state, formAction, pending] = useActionState(
-    async (_prev: { error: string } | null, formData: FormData) => {
-      return await resetPassword(formData)
-    },
-    null
+    resetPassword,
+    initialState
   )
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-4">
+    <div className="flex flex-1 items-center justify-center px-4 py-16">
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle className="text-2xl font-semibold tracking-tight">
@@ -33,39 +40,52 @@ function ResetPasswordForm() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form action={formAction} className="flex flex-col gap-4">
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="password">New password</Label>
-              <Input
-                id="password"
-                name="password"
-                type="password"
-                minLength={8}
-                required
-              />
-            </div>
+          <Form action={formAction}>
+            <FieldGroup>
+              <Field data-invalid={!!state.errors?.password?.length} data-disabled={pending}>
+                <FieldLabel htmlFor="password">New password</FieldLabel>
+                <Input
+                  id="password"
+                  name="password"
+                  type="password"
+                  minLength={8}
+                  disabled={pending}
+                  aria-invalid={!!state.errors?.password?.length}
+                  required
+                />
+                {state.errors?.password && (
+                  <FieldError>{state.errors.password[0]}</FieldError>
+                )}
+              </Field>
 
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="confirmPassword">Confirm password</Label>
-              <Input
-                id="confirmPassword"
-                name="confirmPassword"
-                type="password"
-                minLength={8}
-                required
-              />
-            </div>
+              <Field data-invalid={!!state.errors?.confirmPassword?.length} data-disabled={pending}>
+                <FieldLabel htmlFor="confirmPassword">Confirm password</FieldLabel>
+                <Input
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  type="password"
+                  minLength={8}
+                  disabled={pending}
+                  aria-invalid={!!state.errors?.confirmPassword?.length}
+                  required
+                />
+                {state.errors?.confirmPassword && (
+                  <FieldError>{state.errors.confirmPassword[0]}</FieldError>
+                )}
+              </Field>
 
-            {state?.error && (
-              <p className="text-sm text-destructive" role="alert">
-                {state.error}
-              </p>
-            )}
+              {state.message && (
+                <p className="text-sm text-destructive" role="alert">
+                  {state.message}
+                </p>
+              )}
 
-            <Button type="submit" disabled={pending} className="w-full">
-              {pending ? 'Updating...' : 'Update password'}
-            </Button>
-          </form>
+              <Button type="submit" disabled={pending} className="w-full">
+                {pending && <Spinner />}
+                Update password
+              </Button>
+            </FieldGroup>
+          </Form>
         </CardContent>
       </Card>
     </div>

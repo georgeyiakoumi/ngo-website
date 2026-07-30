@@ -2,24 +2,41 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
+import { loginSchema, type LoginFormState } from './schema'
 
-export async function login(formData: FormData) {
-  const email = formData.get('email') as string
-  const password = formData.get('password') as string
+export async function login(
+  _prev: LoginFormState,
+  formData: FormData
+): Promise<LoginFormState> {
+  const values = {
+    email: formData.get('email') as string,
+    password: formData.get('password') as string,
+  }
 
-  if (!email || !password) {
-    return { error: 'Email and password are required.' }
+  const result = loginSchema.safeParse(values)
+
+  if (!result.success) {
+    return {
+      values,
+      errors: result.error.flatten().fieldErrors,
+      success: false,
+    }
   }
 
   const supabase = await createClient()
 
   const { error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
+    email: result.data.email,
+    password: result.data.password,
   })
 
   if (error) {
-    return { error: error.message }
+    return {
+      values,
+      errors: null,
+      message: error.message,
+      success: false,
+    }
   }
 
   redirect('/')
