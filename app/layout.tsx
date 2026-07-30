@@ -1,10 +1,13 @@
 import type { Metadata } from 'next'
 import { ThemeProvider } from 'next-themes'
+import { SkipLink } from '@/components/layout/skip-link'
+import { Header } from '@/components/layout/header'
+import { Footer } from '@/components/layout/footer'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'Project',
-  description: 'Built with Next.js, shadcn/ui, and Tailwind CSS.',
+  title: 'NGO',
+  description: 'Supporting communities across 8 regions worldwide.',
 }
 
 export default function RootLayout({
@@ -14,14 +17,19 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="min-h-screen bg-background font-sans antialiased">
+      <body className="flex min-h-screen flex-col bg-background font-sans antialiased">
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
         >
-          {children}
+          <SkipLink />
+          <Header />
+          <main id="main-content" className="flex flex-1 flex-col">
+            {children}
+          </main>
+          <Footer />
         </ThemeProvider>
       </body>
     </html>
